@@ -16,10 +16,10 @@ var previousSample, currentSample, bluetoothStats, hasWheel, hasCrank, startDist
 var characteristic, bluetoothDevice, lastUpdate, wakeLock, wakeLockRequest;
 
 window.onload = () => {
-    loadSettings();
-    saveSettings();
+    //loadSettings();
+   // saveSettings();
     
-    updateWheel();
+   // updateWheel();
     feather.replace();
     
     stats.innerText = metric.checked ? "0.0 rpm" : "0.0 rpm";
