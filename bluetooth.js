@@ -11,7 +11,7 @@ const updateRatio = 0.85; // Percent ratio between old/new stats
 const serviceUuid = "cycling_speed_and_cadence";
 const characteristicUuid = "csc_measurement";
 
-var simulate = true, duration = 0;
+var simulate = false, duration = 0;
 var previousSample, currentSample, bluetoothStats, hasWheel, hasCrank, startDistance, wheelSize;
 var characteristic, bluetoothDevice, lastUpdate, wakeLock, wakeLockRequest;
 
