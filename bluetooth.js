@@ -18,13 +18,13 @@ var characteristic, bluetoothDevice, lastUpdate, wakeLock, wakeLockRequest;
 window.onload = () => {
     //loadSettings();
    // saveSettings();
-    
+   
    // updateWheel();
     feather.replace();
-    
+   
     stats.innerText = "0.0 rpm";
    // stats.innerText = metric.checked ? "0.0 rpm" : "0.0 rpm";
-    
+   
     if (simulate) {
         // call a few times and repeat so ui is updated immediately
         handleNotifications();
@@ -50,7 +50,7 @@ window.onload = () => {
     if (navigator.getWakeLock) {
         navigator.getWakeLock('system').then(l => wakeLock = l);
     }
-    
+   
     // Update clock every 5 seconds
     setIntervalImmediately(() => {
         // Got code from https://stackoverflow.com/questions/8888491/
@@ -126,7 +126,7 @@ function handleButton() {
     if (wakeLock && !wakeLock.active) {
         wakeLockRequest = wakeLock.createRequest();
     }
-    
+   
     console.log('Requesting Bluetooth Device...');
     navigator.bluetooth.requestDevice({filters: [{services: [serviceUuid]}]})
     //navigator.bluetooth.requestDevice({acceptAllDevices: true})
@@ -158,7 +158,7 @@ function cleanup() {
     }
 
     lastUpdate = undefined;
-    
+   
     if (characteristic) {
         characteristic.stopNotifications()
         .then(() => {
@@ -210,13 +210,13 @@ function connect() {
             cleanup();
         });
     }
-    
+   
     function onDisconnected() {
         console.log('Bluetooth Device disconnected');
         lastUpdate = undefined;
         connect();
     }
-    
+   
     // This function keeps calling "toTry" until promise resolves or has
     // retried "max" number of times. First retry has a delay of "delay" seconds.
     // "success" is called upon success.
@@ -232,22 +232,22 @@ function connect() {
             }, delay * 1000);
         });
     }
-    
+   
     function handleNotifications(event) {
         previousSample = currentSample;
-        
+       
         if (!simulate) {
             const value = event.target.value;
-            
+           
             const flags = value.getUint8(0, true);
             hasWheel = flags === 1 || flags === 3;
             hasCrank = flags === 2 || flags === 3;
-            
+           
             currentSample = {
-                wheel: value.getUint32(1, true),
-                wheelTime: value.getUint16(5, true),
-                crank: value.getUint16(7, true),
-                crankTime: value.getUint16(9, true),
+               // wheel: value.getUint32(1, true),
+               // wheelTime: value.getUint16(5, true),
+                crank: value.getUint16(1, true),
+                crankTime: value.getUint16(3, true),
             };
         } else {
             hasWheel = true;
@@ -259,14 +259,14 @@ function connect() {
                 crankTime: (previousSample ? previousSample.crankTime : 0) + 1000
             }
         }
-        
+       
         // console.log(previousSample, currentSample);
         // var bluetoothStats = "Wheel Rev: " + currentSample.wheel + "\n";
         // bluetoothStats += "Last Wheel Time: " + currentSample.wheelTime + "\n";
         // bluetoothStats += "Crank Rev: " + currentSample.crank + "\n";
         // bluetoothStats += "Last Crank Time: " + currentSample.crankTime;
         // console.log(bluetoothStats);
-        
+       
         calculateStats();
 
         if (bluetoothStats) {
@@ -283,10 +283,12 @@ function connect() {
                 data = (bluetoothStats.speed * 0.621371).toFixed(1) + " mi/hr\n";
                 data += (bluetoothStats.distance * 0.621371).toFixed(2) + " mi\n";
             }*/
+            if(bluetoothStats.cadence){
             data = bluetoothStats.cadence.toFixed(1) + " rpm\n";
            // data += msToTime(duration);
-            
+           
             stats.innerText = data;
+            }
         }
     }
 
@@ -294,52 +296,55 @@ function connect() {
         var seconds = Math.floor((duration / 1000) % 60),
           minutes = Math.floor((duration / (1000 * 60)) % 60),
           hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
-      
+     
         hours = (hours < 10) ? "0" + hours : hours;
         minutes = (minutes < 10) ? "0" + minutes : minutes;
         seconds = (seconds < 10) ? "0" + seconds : seconds;
-      
+     
         return hours + ":" + minutes + ":" + seconds;
       }
-    
+   
     function diffForSample(current, previous, max) {
-        if (current >= previous) {
+        if (current > previous) {
             return current - previous;
-        } else {
-            return (max - previous) + current;
+        } else if(current === previous) {
+            return -1;
+            }else {
+            return (current + max ) - previous;
         }
     }
-    
+   
     function calculateStats() {
         if (!previousSample) {
             startDistance = currentSample.wheel * wheelSize / 1000 / 1000; // km
             return;
         }
-        
+       
         var distance, cadence, speed;
         if (hasWheel) {
             let wheelTimeDiff = diffForSample(currentSample.wheelTime, previousSample.wheelTime, UINT16_MAX);
             wheelTimeDiff /= 1024; // Convert from fractional seconds (roughly ms) -> full seconds
             let wheelDiff = diffForSample(currentSample.wheel, previousSample.wheel, UINT32_MAX);
-            
+           
             var sampleDistance = wheelDiff * wheelSize / 1000; // distance in meters
             speed = (wheelTimeDiff == 0) ? 0 : sampleDistance / wheelTimeDiff * 3.6; // km/hr
-            
+           
             distance = currentSample.wheel * wheelSize / 1000 / 1000; // km
             distance -= startDistance;
         }
-        
+       
         if (hasCrank) {
             let crankTimeDiff = diffForSample(currentSample.crankTime, previousSample.crankTime, UINT16_MAX);
-            crankTimeDiff /= 1024; // Convert from fractional seconds (roughly ms) -> full seconds
+            //crankTimeDiff /= 1024; // Convert from fractional seconds (roughly ms) -> full seconds
             let crankDiff = diffForSample(currentSample.crank, previousSample.crank, UINT16_MAX);
-            
-            cadence = (crankTimeDiff == 0) ? 0 : (60 * crankDiff / crankTimeDiff); // RPM
+            let prevCadence = cadence;
+            cadence = crankTimeDiff !== -1 && crankDiff > 0 ? ((crankDiff *1024) / crankTimeDiff) * 60: prevCadence; // RPM
+            console.log(currentSample.crankTime,previousSample.crankTime,cadence);
         }
-        
-        if (bluetoothStats) {
+       
+        if (bluetoothStats && cadence) {
             bluetoothStats = {
-                cadence: bluetoothStats.cadence * (1 - updateRatio) + cadence * updateRatio,
+                cadence: cadence,
                 distance: distance,
                 speed: bluetoothStats.speed * (1 - updateRatio) + speed * updateRatio
             };
@@ -351,4 +356,3 @@ function connect() {
             };
         }
     }
-    
