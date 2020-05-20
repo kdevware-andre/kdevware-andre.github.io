@@ -220,7 +220,7 @@ function diffForSample(current, previous, max) {
 }
 
 function calculateStats() {
-
+    var cadence;
     if (hasCrank) {
         let crankTimeDiff = diffForSample(currentSample.crankTime, previousSample.crankTime, UINT16_MAX);
         let crankDiff = diffForSample(currentSample.crank, previousSample.crank, UINT16_MAX);
