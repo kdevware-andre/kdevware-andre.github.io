@@ -1,37 +1,46 @@
-## Welcome to GitHub Pages
 
-You can use the [editor on GitHub](https://github.com/kdevware-andre/kdevware-andre.github.io/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+# Stremio TV service for Media Station X
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+This is a Media Station X service that opens Stremio TV Web.
 
-### Markdown
+NOTE: YOU MIGHT WANT THE [STREMIO SERVICE](https://www.stremio.com/download-service) RUNNING TOGETHER WITH THIS SERVICE.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+# Update: [Since April 30, 2024 Stremio is now available on LG Content Store for models 2020+](https://blog.stremio.com/stremio-is-now-available-on-lg-tvs-for-models-2020/). I'm maintaining this repo public for now, as it can be usefull for people with older TV models.
 
-```markdown
-Syntax highlighted code block
+## Motivation
 
-# Header 1
-## Header 2
-### Header 3
+As in this repo's publication date there isn't an official Stremio app for LGTV's WebOS system. The methods to get around it are impratical, in need of additional hardware or infunctional in some televisions (casting, chromecast or native web browser).
 
-- Bulleted
-- List
+## Solution
 
-1. Numbered
-2. List
+With this in mind, recently I found out about Media Station X's existence, a cross-platform web application for creating customized media pages, as said by them in their website. Also found out about a MSX service (MSXPlayer) possible to configure to open webpages (like Stremio Web), but it has some problems in my view: this service is only available in russian and it requires to choose which webpage to open every time the app opens.
 
-**Bold** and _Italic_ and `Code` text
+## Final Product
 
-[Link](url) and ![Image](src)
-```
+I researched and developed this (low effort) MSX service that serves purely for opening the Stremio TV Web as soon as the Media Station X finishes loading.
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### Jekyll Themes
+## Tutorial (LGTV's WebOS in mind but works to all devices)
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/kdevware-andre/kdevware-andre.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+1. Create a [Stremio account](https://www.stremio.com/register)
+2. Install the [Media Station X from the LG app store](https://us.lgappstv.com/main/tvapp/detail?appId=464834)
+3. Launch the Media Station X application
+   ![MSX Start Menu](https://raw.githubusercontent.com/bartche/msx/main/imgs/msxmain.jpeg)
+5. Navigate to Settings → Validate Links → No
+   ![MSX Validade Links Menu](https://raw.githubusercontent.com/bartche/msx/main/imgs/validadelinks.jpeg)
+7. Navigate to Settings → Start Parameter → Setup
+   ![MSX Start Parameters](https://raw.githubusercontent.com/bartche/msx/main/imgs/startparam.jpeg)
+9. Set the security lock (for HTTPS mode) and enter:
+   ```bartche.github.io```
+10. Save it and you are done!
 
-### Support or Contact
+## Disclaimer
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+I'm not the owner of any program or website presented here, nor do I know their owners.
+Stremio TV Web is an unmaintained outdated version of Stremio and you might encounter some bugs and issues that will not be solved as [said by Stremio team](https://www.reddit.com/r/Stremio/comments/1bjklx8/comment/kvv4qn4).
+
+## Reference
+
+- [Stremio](https://www.stremio.com/)
+- [Stremio TV Web](https://tv.strem.io/)
+- [Media Station X](https://msx.benzac.de/info/)
